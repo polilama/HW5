@@ -20,7 +20,6 @@ public class PlaywrightFixture {
     }
 
     public Page getPage() {
-
         return page;
     }
 
