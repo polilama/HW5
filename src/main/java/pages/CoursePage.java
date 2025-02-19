@@ -5,13 +5,19 @@ import com.microsoft.playwright.Page;
 
 public class CoursePage {
     private final Page page;
+    private final String baseUrl;
 
-    public CoursePage(Page page) {
+    public CoursePage(Page page, String baseUrl) {
         this.page = page;
+        this.baseUrl = baseUrl;
     }
 
     public void navigateToDevelopment() {
-        page.navigate("https://otus.ru/uslugi-kompaniyam");
+        page.navigate(baseUrl + "/uslugi-kompaniyam");
+    }
+
+    public void navigateToCatalog() {
+        page.navigate(baseUrl + "/catalog/courses");
     }
 
     public boolean isNotFoundTextVisible() {
@@ -44,10 +50,6 @@ public class CoursePage {
         return courseCatalog.isVisible();
     }
 
-    public void navigateToCatalog() {
-        page.navigate("https://otus.ru/catalog/courses");
-    }
-
     public boolean areAllDirectionsChecked() {
         Locator allDirections = page.locator("text='Все направления'");
         return allDirections.isChecked();
@@ -74,4 +76,37 @@ public class CoursePage {
     public void resetFilter() {
         page.locator("text='Сбросить фильтр'").click();
     }
+    public void navigateToSubscription() {
+        page.navigate(baseUrl + "/subscription");
+    }
+
+    public Locator getSubscriptionTiles() {
+        return page.locator(".subscription-tile");
+    }
+
+    public boolean isSubscriptionDescriptionVisible() {
+        return page.locator(".subscription-description").isVisible();
+    }
+
+    public void clickSubscriptionCollapse() {
+        page.locator("text='Свернуть'").click();
+    }
+
+    public void clickBuyButton() {
+        page.locator("button:has-text('Купить')").click();
+    }
+
+    public boolean isPaymentPageVisible() {
+        return page.locator(".payment-page").isVisible();
+    }
+
+    public Locator getCoursePrice() {
+        return page.locator(".course-price");
+    }
+
+    public void selectTrialSubscription() {
+        page.locator("input[name='subscription'][value='trial']").check();
+    }
+
+    public Locator get;
 }

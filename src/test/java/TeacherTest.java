@@ -1,12 +1,14 @@
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.microsoft.playwright.*;
-import org.example.PlaywrightFixture;
-import org.example.TestModule;
-import org.junit.jupiter.api.*;
+import com.microsoft.playwright.Locator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import pages.TeacherPage;
 import pages.CoursePage;
+import org.example.PlaywrightFixture;
+import org.example.TestModule;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,17 +16,17 @@ public class TeacherTest {
     @Inject
     private PlaywrightFixture playwrightFixture;
 
-    private Page page;
+    @Inject
     private TeacherPage teacherPage;
+
+    @Inject
     private CoursePage coursePage;
 
     @BeforeEach
     public void setup() {
         Injector injector = Guice.createInjector(new TestModule());
         this.playwrightFixture = injector.getInstance(PlaywrightFixture.class);
-        page = playwrightFixture.getPage();
-        teacherPage = new TeacherPage(page);
-        coursePage = new CoursePage(page);
+        injector.injectMembers(this);
     }
 
     @AfterEach
@@ -50,10 +52,10 @@ public class TeacherTest {
         assertTrue(teacherPage.isTeacherPopupVisible(), "Popup преподавателя не открылся");
 
         teacherPage.clickNextButton();
-        assertTrue(page.locator(".teacher-card").isVisible(), "Карточка следующего преподавателя не открылась");
+        assertTrue(teacherPage.isTeacherPopupVisible(), "Карточка следующего преподавателя не открылась");
 
         teacherPage.clickPrevButton();
-        assertTrue(page.locator(".teacher-card").isVisible(), "Карточка предыдущего преподавателя не открылась");
+        assertTrue(teacherPage.isTeacherPopupVisible(), "Карточка предыдущего преподавателя не открылась");
     }
 
     @Test
@@ -89,24 +91,24 @@ public class TeacherTest {
 
     @Test
     public void testSubscriptionOptions() {
-        page.navigate("https://otus.ru/subscription");
+        coursePage.navigateToSubscription();
 
-        Locator subscriptionTiles = page.locator(".subscription-tile");
+        Locator subscriptionTiles = coursePage.getSubscriptionTiles();
         assertTrue(subscriptionTiles.count() > 0, "Варианты подписки не отображаются");
 
         subscriptionTiles.locator(":first-child").locator("text='Подробнее'").click();
-        assertTrue(page.locator(".subscription-description").isVisible(), "Описание не развернулось");
+        assertTrue(coursePage.isSubscriptionDescriptionVisible(), "Описание не развернулось");
 
-        page.locator("text='Свернуть'").click();
-        assertTrue(page.locator(".subscription-description").isVisible(), "Описание не свернулось");
+        coursePage.clickSubscriptionCollapse();
+        assertTrue(coursePage.isSubscriptionDescriptionVisible(), "Описание не свернулось");
 
-        page.locator("button:has-text('Купить')").click();
-        assertTrue(page.locator(".payment-page").isVisible(), "Страница оплаты не открылась");
+        coursePage.clickBuyButton();
+        assertTrue(coursePage.isPaymentPageVisible(), "Страница оплаты не открылась");
 
-        Locator price = page.locator(".course-price");
+        Locator price = coursePage.getCoursePrice();
         assertTrue(price.isVisible(), "Стоимость курса не отображается");
 
-        page.locator("input[name='subscription'][value='trial']").check();
+        coursePage.selectTrialSubscription();
         assertTrue(price.textContent().contains("0"), "Стоимость не изменилась для Trial подписки");
     }
 }

@@ -5,13 +5,15 @@ import com.microsoft.playwright.Page;
 
 public class TeacherPage {
     private final Page page;
+    private final String baseUrl;
 
-    public TeacherPage(Page page) {
+    public TeacherPage(Page page, String baseUrl) {
         this.page = page;
+        this.baseUrl = baseUrl;
     }
 
     public void navigate() {
-        page.navigate("https://otus.ru/lessons/clickhouse/");
+        page.navigate(baseUrl + "/lessons/clickhouse/");
     }
 
     public boolean isTeachersSectionVisible() {
@@ -23,6 +25,7 @@ public class TeacherPage {
         Locator teacherTiles = page.locator(".teachers-list .teacher-tile");
         return teacherTiles.count();
     }
+
     public void dragAndDropFirstTile() {
         Locator teacherTiles = page.locator(".teachers-list .teacher-tile");
         Locator firstTile = teacherTiles.locator(":first-child");
@@ -49,4 +52,3 @@ public class TeacherPage {
         page.locator(".prev-button").click();
     }
 }
-
